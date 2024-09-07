@@ -1,19 +1,13 @@
-import asyncio
-from logging.config import fileConfig
-from sqlalchemy.ext.asyncio import AsyncEngine
-from sqlalchemy.ext.asyncio import create_async_engine
-from sqlalchemy.ext.declarative import DeclarativeMeta
 from sqlalchemy import engine_from_config, pool
+from sqlalchemy.ext.declarative import declarative_base
 from alembic import context
-from app.config import settings
 from app.database import Base
+from app.models import User, Post  # Импортируйте все ваши модели здесь
 
-config = context.config
-fileConfig(config.config_file_name)
 target_metadata = Base.metadata
 
 def run_migrations_offline():
-    url = settings.DATABASE_URL
+    url = context.get_x_argument(as_dictionary=True).get('url', None)
     context.configure(
         url=url,
         target_metadata=target_metadata,
@@ -25,23 +19,26 @@ def run_migrations_offline():
         context.run_migrations()
 
 def run_migrations_online():
-    connectable = create_async_engine(settings.DATABASE_URL, echo=True)
-
-    async def do_run_migrations():
-        async with connectable.connect() as connection:
-            await connection.run_sync(target_metadata.create_all)
-            await context.run_migrations()
-
-    asyncio.run(do_run_migrations())
-
-    context.configure(
-        connection=connectable,
-        target_metadata=target_metadata,
+    configuration = context.config
+    connectable = engine_from_config(
+        configuration.get_section(configuration.config_ini_section, {}),
+        prefix='sqlalchemy.',
+        poolclass=pool.NullPool,
     )
 
-    if context.is_offline_mode():
-        run_migrations_offline()
-    else:
-        run_migrations_online()
+    with connectable.connect() as connection:
+        context.configure(
+            connection=connection,
+            target_metadata=target_metadata,
+        )
+
+        with context.begin_transaction():
+            context.run_migrations()
+
+if context.is_offline_mode():
+    run_migrations_offline()
+else:
+    run_migrations_online()
+
 
 

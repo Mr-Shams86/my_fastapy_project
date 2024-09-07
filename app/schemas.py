@@ -1,22 +1,37 @@
-# These classes define Pydantic models for representing posts and users with different fields for
-# creation and reading purposes.
-# app/schemas.py
-
 from pydantic import BaseModel
+from typing import Optional
 
-class UserCreate(BaseModel):
-    login: str
-    password: str  # Обычный пароль, который будет зашифрован перед сохранением
-    name: str = None
+class PostBase(BaseModel):
+    title: str
+    content: str
+    image_url: Optional[str] = None
 
-class UserLogin(BaseModel):
-    login: str
-    password: str  # Пароль для входа
+    class Config:
+        orm_mode = True
 
-class UserOut(BaseModel):
+class PostCreate(PostBase):
+    pass
+
+class Post(PostBase):
     id: int
-    login: str
-    name: str
+    user_id: int
+
+    class Config:
+        orm_mode = True
+
+class UserBase(BaseModel):
+    username: str
+    email: str
+
+    class Config:
+        orm_mode = True
+
+class UserCreate(UserBase):
+    password: str
+
+class User(UserBase):
+    id: int
+    is_active: bool
 
     class Config:
         orm_mode = True
