@@ -42,7 +42,7 @@ async def create_user(db: AsyncSession, user_create: schemas.UserCreate):
     hashed_password = get_password_hash(user_create.password)
     
     # Создание нового пользователя
-    new_user = User(username=user_create.username, email=user_create.email, password=hashed_password)
+    new_user = User(username=user_create.username, email=user_create.email, hashed_password=hashed_password)
     db.add(new_user)
     
     try:
@@ -53,6 +53,7 @@ async def create_user(db: AsyncSession, user_create: schemas.UserCreate):
         raise HTTPException(status_code=400, detail="Error creating user")
     
     return new_user
+
 
 
 
