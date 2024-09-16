@@ -6,10 +6,10 @@ from passlib.context import CryptContext
 from sqlalchemy.exc import IntegrityError
 from fastapi import HTTPException
 
-# Настройка контекста для хеширования паролей
+
 pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
 
-# Функция для хеширования пароля
+
 def get_password_hash(password: str) -> str:
     return pwd_context.hash(password)
 

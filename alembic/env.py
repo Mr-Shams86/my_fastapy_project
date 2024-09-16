@@ -2,7 +2,7 @@ from sqlalchemy import engine_from_config, pool
 from sqlalchemy.ext.declarative import declarative_base
 from alembic import context
 from app.database import Base
-from app.models import User, Post  # Импортируйте все ваши модели здесь
+from app.models import User, Post  
 
 target_metadata = Base.metadata
 
