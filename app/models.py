@@ -10,6 +10,7 @@ class Post(Base):
     content = Column(Text, nullable=False)
     image_url = Column(String, nullable=True)
     user_id = Column(Integer, ForeignKey("users.id"), nullable=False)
+    
     user = relationship("User", back_populates="posts")
 
 class User(Base):

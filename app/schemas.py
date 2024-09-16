@@ -4,7 +4,7 @@ from typing import Optional
 class PostBase(BaseModel):
     title: str
     content: str
-    image_url: Optional[str] = None
+    image_url:str
 
     class Config:
         orm_mode = True
