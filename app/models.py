@@ -7,8 +7,8 @@ class Post(Base):
     
     id = Column(Integer, primary_key=True, index=True)
     title = Column(String, index=True, nullable=False)
-    content = Column(Text, nullable=False)
-    image_url = Column(String, nullable=True)
+    content = Column(Text, nullable=False)  # Обязательное поле для содержания новости
+    image_url = Column(String, nullable=False)  # Обязательное поле для изображения
     user_id = Column(Integer, ForeignKey("users.id"), nullable=False)
     
     user = relationship("User", back_populates="posts")
@@ -22,7 +22,8 @@ class User(Base):
     hashed_password = Column(String, nullable=False)
     is_active = Column(Boolean, default=True)
 
-    posts = relationship("Post", back_populates="user")
+    posts = relationship("Post", back_populates="user", cascade="all, delete-orphan")  # Добавлено каскадное удаление
+
 
 
 
