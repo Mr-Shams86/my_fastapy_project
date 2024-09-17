@@ -4,9 +4,9 @@ services:
   db:
     image: postgres:15
     environment:
-      POSTGRES_USER: fastapi_user
-      POSTGRES_PASSWORD: fastapi_password
-      POSTGRES_DB: fastapi_db
+      POSTGRES_USER: "fastapi_user"
+      POSTGRES_PASSWORD: "fastapi_password"
+      POSTGRES_DB: "fastapi_db"
     volumes:
       - postgres_data:/var/lib/postgresql/data
     ports:
