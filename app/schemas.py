@@ -7,7 +7,7 @@ class PostBase(BaseModel):
     image_url:str
 
     class Config:
-        from_attributes = True
+        orm_mode = True
 
 class PostCreate(PostBase):
     pass
