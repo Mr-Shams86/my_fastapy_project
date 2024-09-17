@@ -4,7 +4,7 @@ from app import schemas
 from app.models import Post, User
 from passlib.context import CryptContext
 from sqlalchemy.exc import IntegrityError
-from fastapi import HTTPException
+from fastapi import HTTPException, status
 
 
 pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
@@ -30,13 +30,16 @@ async def get_posts(db: AsyncSession, skip: int = 0, limit: int = 10):
 
 async def get_user_by_email(db: AsyncSession, email: str) -> User:
     result = await db.execute(select(User).filter(User.email == email))
-    return result.scalars().first()
+    user = result.scalars().first()
+    if user is None:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="User not found")
+    return user
 
-async def create_user(db: AsyncSession, user_create: schemas.UserCreate):
+async def create_user(db: AsyncSession, user_create: schemas.UserCreate) -> User:
     # Проверка на существующий email
     existing_user = await get_user_by_email(db, user_create.email)
     if existing_user:
-        raise HTTPException(status_code=400, detail="Email already registered")
+        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="Email already registered")
 
     # Хеширование пароля
     hashed_password = get_password_hash(user_create.password)
@@ -50,7 +53,7 @@ async def create_user(db: AsyncSession, user_create: schemas.UserCreate):
         await db.refresh(new_user)
     except IntegrityError:
         await db.rollback()
-        raise HTTPException(status_code=400, detail="Error creating user")
+        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="Error creating user")
     
     return new_user
 
